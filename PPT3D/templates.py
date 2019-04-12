@@ -9,6 +9,15 @@ samples = [
                 'class': 'Title',
                 'rect': [0.1, 0.45, 0.9, 0.55],
                 'text': '标题',
+                'font': {
+                    'family': '微软雅黑',
+                    'size': 32,
+                },
+                'color': {
+                    'outline': None,
+                    'fill': None,
+                    'text': [0, 0, 0],
+                }
             },
         ]
     },
@@ -19,11 +28,29 @@ samples = [
                 'class': 'Title',
                 'rect': [0.1, 0.15, 0.9, 0.25],
                 'text': '标题',
+                'font': {
+                    'family': '微软雅黑',
+                    'size': 32,
+                },
+                'color': {
+                    'outline': None,
+                    'fill': None,
+                    'text': [0, 0, 0],
+                }
             },
             {
                 'class': 'Text',
                 'rect': [0.1, 0.35, 0.9, 0.85],
                 'text': '内容',
+                'font': {
+                    'family': '微软雅黑',
+                    'size': 18,
+                },
+                'color': {
+                    'outline': None,
+                    'fill': None,
+                    'text': [0, 0, 0],
+                }
             },
         ]
     }

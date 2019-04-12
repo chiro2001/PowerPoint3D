@@ -1,12 +1,12 @@
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
-from .glfw import *
+from PPT3D.glfw import *
 from win32api import GetSystemMetrics
 import sys
-from .settings import Settings
-from .renderer import Renderer
-from .templates import Templates
+from PPT3D.settings import Settings
+from PPT3D.renderer import Renderer
+from PPT3D.templates import Templates
 
 
 class PPT3D:
