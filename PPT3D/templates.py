@@ -1,8 +1,55 @@
+import json
+
+
+samples = [
+    {
+        'name': '仅标题',
+        'frames': [
+            {
+                'class': 'Title',
+                'rect': [0.1, 0.45, 0.9, 0.55],
+                'text': '标题',
+            },
+        ]
+    },
+    {
+        'name': '标题+正文',
+        'frames': [
+            {
+                'class': 'Title',
+                'rect': [0.1, 0.15, 0.9, 0.25],
+                'text': '标题',
+            },
+            {
+                'class': 'Text',
+                'rect': [0.1, 0.35, 0.9, 0.85],
+                'text': '内容',
+            },
+        ]
+    }
+]
+
+
 class Templates:
     def __init__(self):
-        # 自动加载
-        pass
+        self.FILENAME = 'templates.json'
+        self.templates = None
+        self.reload()
 
     def reload(self):
-        pass
+        try:
+            with open(self.FILENAME, 'r') as f:
+                self.templates = json.loads(f.read())
+        except FileNotFoundError:
+            self.templates = samples
+            with open(self.FILENAME, 'w') as f:
+                f.write(json.dumps(self.templates))
 
+    def get(self, index: int=None):
+        if index is None:
+            return self.templates
+        return self.templates[index]
+
+
+if __name__ == '__main__':
+    _temp = Templates()

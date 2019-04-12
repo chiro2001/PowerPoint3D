@@ -19,10 +19,10 @@ class PPT3D:
         self.templates = Templates()
 
         # 取得屏幕大小
-        self.zoom_window = 1
-        self.rect_screen = (GetSystemMetrics(0), GetSystemMetrics(1))
-        self.rect_window = (self.rect_screen[0] * self.zoom_window,
-                            self.rect_screen[1] * self.zoom_window)
+        self.zoom_window = 0.5
+        self.rect_screen = list(map(int, [GetSystemMetrics(0), GetSystemMetrics(1)]))
+        self.rect_window = list(map(int, [self.rect_screen[0] * self.zoom_window,
+                                          self.rect_screen[1] * self.zoom_window]))
         # print(self.rect_screen)
 
         # 初始化glfw
@@ -64,7 +64,7 @@ class PPT3D:
             glOrtho(-ratio, ratio, -1, 1, 1, -1)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
-            # glRotatef(glfwGetTime() * 50, 0, 0, 1)
+            glRotatef(glfwGetTime() * 50, 0, 0, 1)
             glBegin(GL_TRIANGLES)
             glColor3f(1, 0, 0)
             glVertex3f(-0.6, -0.4, 0)
