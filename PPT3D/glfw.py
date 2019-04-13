@@ -389,7 +389,7 @@ glfwGetMonitorName              = _glfw.glfwGetMonitorName
 glfwGetMonitorName.restype = c_char_p
 # glfwSetMonitorCallback          = _glfw.glfwSetMonitorCallback
 # glfwGetVideoModes               = _glfw.glfwGetVideoModes
-# glfwGetVideoMode                = _glfw.glfwGetVideoMode
+glfwGetVideoMode                = _glfw.glfwGetVideoMode
 
 # --- Gama --------------------------------------------------------------------
 glfwSetGamma                   = _glfw.glfwSetGamma

@@ -30,10 +30,10 @@ samples = [
                 'text': '标题',
                 'font': {
                     'family': '微软雅黑',
-                    'size': 32,
+                    'size': 64,
                 },
                 'color': {
-                    'outline': None,
+                    'outline': '#FF0000',
                     'fill': None,
                     'text': [0, 0, 0],
                 }
@@ -44,10 +44,10 @@ samples = [
                 'text': '内容',
                 'font': {
                     'family': '微软雅黑',
-                    'size': 18,
+                    'size': 32,
                 },
                 'color': {
-                    'outline': None,
+                    'outline': '#FF0000',
                     'fill': None,
                     'text': [0, 0, 0],
                 }
@@ -64,13 +64,16 @@ class Templates:
         self.reload()
 
     def reload(self):
-        try:
-            with open(self.FILENAME, 'r') as f:
-                self.templates = json.loads(f.read())
-        except FileNotFoundError:
-            self.templates = samples
-            with open(self.FILENAME, 'w') as f:
-                f.write(json.dumps(self.templates))
+        # try:
+        #     with open(self.FILENAME, 'r') as f:
+        #         self.templates = json.loads(f.read())
+        # except FileNotFoundError:
+        #     self.templates = samples
+        #     with open(self.FILENAME, 'w') as f:
+        #         f.write(json.dumps(self.templates))
+        self.templates = samples
+        with open(self.FILENAME, 'w') as f:
+            f.write(json.dumps(self.templates))
 
     def get(self, index: int=None):
         if index is None:

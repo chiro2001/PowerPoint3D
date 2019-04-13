@@ -41,3 +41,4 @@ Templates[]:
 ## 其他
 
 - [GLFW用](https://www.glfw.org/download.html)
+- [加载纹理](http://www.dataguru.cn/article-11425-1.html)
