@@ -1,9 +1,11 @@
 import json
 
-
 samples = [
+    # page
     {
         'name': '仅标题',
+        'display': True,
+        'position': [0, 0, 0],
         'frames': [
             {
                 'class': 'Title',
@@ -23,6 +25,8 @@ samples = [
     },
     {
         'name': '标题+正文',
+        'display': True,
+        'position': [0, 0, 0],
         'frames': [
             {
                 'class': 'Title',
@@ -75,7 +79,7 @@ class Templates:
         with open(self.FILENAME, 'w') as f:
             f.write(json.dumps(self.templates))
 
-    def get(self, index: int=None):
+    def get(self, index: int = None):
         if index is None:
             return self.templates
         return self.templates[index]
