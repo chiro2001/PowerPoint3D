@@ -123,15 +123,22 @@ class Frame:
         self.fclass, self.rect, self.text, self.font, self.color_draw, self.floating = \
             fclass, rect, text, font, color_draw, floating
         self.image = image
-        if self.image is not None:
-            self.fclass = 'Image'
-
         if self.rect is None:
             # 目标上下浮动
             self.rect = list(map(lambda x: random.sample([-1, 1], 1)[0] * random.random() * 0.04 + x,
                                  [0.1, 0.45]))
             self.rect.append(self.rect[0] + 0.8)
             self.rect.append(self.rect[1] + 0.15)
+        if self.image is not None:
+            self.fclass = 'Image'
+            self.rect = [0, 0]
+            if self.image.size[0] > self.image.size[1]:
+                self.rect.append(1)
+                self.rect.append(self.image.size[1] / self.image.size[0])
+            else:
+                self.rect.append(self.image.size[0] / self.image.size[1])
+                self.rect.append(1)
+
         if self.font is None:
             self.font = Font()
         if self.color_draw is None:
@@ -215,13 +222,17 @@ class PPT:
         self.images = []
 
         # 初始化一个页面
-        page = Page()
-        page.position.load([random.random() * 0.5 for i in range(3)])
-        self.pages.append(page)
-        page = Page()
-        page.frames.append(Frame(image=Image.open('i.jpg')))
-        page.position.load([random.random() * 0.5 for i in range(3)])
-        self.pages.append(page)
+        # page = Page()
+        # page.position.load([random.random() * 0.5 for i in range(3)])
+        # self.pages.append(page)
+        for i in range(3):
+            page = Page()
+            page.frames.append(Frame(image=Image.open('%s.png' % (i % 2 + 1))))
+            # page.frames.append(Frame())
+            # page.frames[0] = Frame(image=Image.open('i.jpg'))
+            # page.position.load([random.random() * 0.3 for i in range(3)])
+            page.position.x += i
+            self.pages.append(page)
 
     def load(self, ppt: dict=None, filename: str=None):
         if filename is not None:
