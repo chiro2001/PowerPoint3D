@@ -13,82 +13,6 @@ from PIL import Image
 from base_logger import getLogger
 
 
-class Motion:
-    def __init__(self, ppt: PPT):
-        self.distance = 3
-        self.x, self.y, self.z = 0, 0, self.distance
-        self.facing = 0
-        self.target = 0
-        # 0 - 静止, 1 - 活动
-        self.status = 1
-        self.ppt = ppt
-
-    def click(self):
-        if self.status == 1:
-            if self.target == len(self.ppt.pages) - 1:
-                self.target = 0
-            else:
-                self.target += 1
-            return
-        if self.target == len(self.ppt.pages) - 1:
-            self.target = 0
-        else:
-            self.target += 1
-        self.x, self.y, self.z = self.ppt.pages[self.facing].position.json()
-        self.status = 1
-
-    def mouse(self, button, mode, x, y):
-        if button == GLUT_LEFT_BUTTON and mode == GLUT_DOWN:
-            logger.info('按下鼠标 (%s, %s)' % (x, y))
-            self.click()
-
-    def keyboard(self, key, x, y):
-        # Special Key 处理
-        if key in [GLUT_KEY_UP, GLUT_KEY_DOWN, GLUT_KEY_LEFT, GLUT_KEY_RIGHT]:
-            if key in [GLUT_KEY_DOWN, GLUT_KEY_RIGHT]:
-                self.click()
-            elif key in [GLUT_KEY_UP, GLUT_KEY_LEFT]:
-                # TODO: 向前
-                pass
-            return
-        if type(key) is int:
-            return
-
-        # 切换全屏模式
-        if key == b'f':
-            glutFullScreenToggle()
-            return
-
-        # key = key.decode().lower()
-        if key in [b' ', b'\r']:
-            self.click()
-        else:
-            print(key)
-
-        if key in [b'\x1b', b'q']:
-            sys.exit()
-
-    def timer(self):
-        if self.status == 1:
-            # facing = self.ppt.pages[self.facing].position
-            target = self.ppt.pages[self.target].position
-            self.x += (target.x - self.x) / 10
-            self.y += (target.y - self.y) / 10
-            self.z += (target.z - self.z) / 10
-
-            if abs(self.x - target.x) <= 0.0002:
-                self.facing = self.target
-                self.x, self.y, self.z = self.ppt.pages[self.facing].position.json()
-                self.status = 0
-
-        self.set_look_at()
-
-    def set_look_at(self):
-        gluLookAt(self.x * 5, self.y * 5, self.z * 5 + self.distance,
-                  self.x * 5, self.y * 5, self.z * 5 + self.distance - 1,
-                  0, 1, 0)
-
-
 class PPT3D:
 
     def __init__(self, ppt: PPT, fullscreen=False):
@@ -100,7 +24,7 @@ class PPT3D:
         self.settings = Settings()
         # self.renderer = Renderer()
         self.templates = Templates()
-        self.motion = Motion(self.ppt)
+        self.motion = Motion(self)
 
         # 显示相关
         # Frame数量
@@ -127,6 +51,7 @@ class PPT3D:
 
         if fullscreen:
             glutFullScreen()
+        self.fullscreen = fullscreen
 
         self.glut_init(self.rect_window[0], self.rect_window[1])
 
@@ -141,14 +66,18 @@ class PPT3D:
         # 第三组upx,upy,upz 相机向上的方向在世界坐标中的方向
 
         # glutWireTeapot(5)
+        # glLoadIdentity()
         # glutSolidTeapot(5)
         # glLoadIdentity()
-        glTranslate(-self.rect_page[0] / 1 * self.size_room[0], -self.rect_page[1] / 1 * self.size_room[1], 0)
+        # glTranslate(-self.rect_page[0] / 1, -self.rect_page[1] / 1, 0)
+        glTranslate(-0.5, -0.5, 0)
 
         index_frame = 0
 
         # for index in range(self.num_frame):
         for index in range(len(self.ppt.pages)):
+            # glLoadIdentity()
+
             page = self.ppt.pages[index]
             # glTranslate(page.position.x + (self.rect_page[0] * self.size_room[0] + 0.5) * index,
             #             page.position.y,
@@ -158,14 +87,19 @@ class PPT3D:
                         page.position.z)
             # print(page.json())
 
+            # glutWireCube(1)
+
             for i in range(len(page.frames)):
                 frame = page.frames[i]
                 # 开始绘制这个Frame，同时设置纹理映射
                 glBindTexture(GL_TEXTURE_2D, index_frame)
                 index_frame += 1
-                vec_target = [self.size_room[0] * page.position.x + frame.rect[0],
-                              self.size_room[1] * page.position.y + frame.rect[1],
-                              self.size_room[2] * page.position.z]
+                # vec_target = [page.position.x + frame.rect[0],
+                #               page.position.y + frame.rect[1],
+                #               page.position.z]
+                vec_target = [frame.rect[0],
+                              frame.rect[1],
+                              0]
                 # 绘制四边形
                 glBegin(GL_QUADS)
                 glTexCoord2f(0.0, 0.0)
@@ -176,24 +110,28 @@ class PPT3D:
                 # glVertex3f(self.size_room[0] * (page.position.x + self.rect_page[0]),
                 #            self.size_room[1] * page.position.y,
                 #            self.size_room[2] * page.position.z)
-                glVertex3f(vec_target[0] + self.size_room[0] * (frame.rect[2] - frame.rect[0]),
+                glVertex3f(vec_target[0] + (frame.rect[2] - frame.rect[0]),
                            vec_target[1],
                            vec_target[2])
                 glTexCoord2f(1.0, 1.0)
                 # glVertex3f(self.size_room[0] * (page.position.x + self.rect_page[0]),
                 #            self.size_room[1] * (page.position.y + self.rect_page[1]),
                 #            self.size_room[2] * page.position.z)
-                glVertex3f(vec_target[0] + self.size_room[0] * (frame.rect[2] - frame.rect[0]),
-                           vec_target[1] + self.size_room[1] * (frame.rect[3] - frame.rect[1]),
+                glVertex3f(vec_target[0] + (frame.rect[2] - frame.rect[0]),
+                           vec_target[1] + (frame.rect[3] - frame.rect[1]),
                            vec_target[2])
                 glTexCoord2f(0.0, 1.0)
                 # glVertex3f(self.size_room[0] * page.position.x,
                 #            self.size_room[1] * (page.position.y + self.rect_page[1]),
                 #            self.size_room[2] * page.position.z)
                 glVertex3f(vec_target[0],
-                           vec_target[1] + self.size_room[1] * (frame.rect[3] - frame.rect[1]),
+                           vec_target[1] + (frame.rect[3] - frame.rect[1]),
                            vec_target[2])
                 glEnd()
+
+            glTranslate(-page.position.x,
+                        -page.position.y,
+                        -page.position.z)
 
         # 刷新屏幕，产生动画效果
         glutSwapBuffers()
@@ -313,6 +251,119 @@ class PPT3D:
 
     def mainloop(self):
         glutMainLoop()
+
+
+class Motion:
+    def __init__(self, ppt3d: PPT3D):
+        self.distance = 1
+        self.x, self.y, self.z = 0, 0, self.distance
+        self.facing = 0
+        self.target = 0
+        # 0 - 静止, 1 - 活动
+        self.status = 1
+        self.ppt = ppt3d.ppt
+        self.ppt3d = ppt3d
+
+    def click(self):
+        if self.status == 1:
+            if self.target == len(self.ppt.pages) - 1:
+                self.target = 0
+            else:
+                self.target += 1
+            return
+        if self.target == len(self.ppt.pages) - 1:
+            self.target = 0
+        else:
+            self.target += 1
+        self.x, self.y, self.z = self.ppt.pages[self.facing].position.json()
+        self.status = 1
+
+    def preview(self):
+        if self.status == 1:
+            if self.target == 0:
+                self.target = len(self.ppt.pages) - 1
+            else:
+                self.target -= 1
+            return
+        if self.target == 0:
+            self.target = len(self.ppt.pages) - 1
+        else:
+            self.target -= 1
+        self.x, self.y, self.z = self.ppt.pages[self.facing].position.json()
+        self.status = 1
+
+    def mouse(self, button, mode, x, y):
+        if button == GLUT_LEFT_BUTTON and mode == GLUT_DOWN:
+            logger.info('按下鼠标左键 (%s, %s)' % (x, y))
+            # 在左键按下屏幕/窗口 1/4 位置向前
+            if self.ppt3d.fullscreen and x >= self.ppt3d.rect_screen[0] / 4:
+                self.click()
+            elif self.ppt3d.fullscreen and x < self.ppt3d.rect_screen[0] / 4:
+                self.preview()
+            if not self.ppt3d.fullscreen and x >= self.ppt3d.rect_window[0] / 4:
+                self.click()
+            elif not self.ppt3d.fullscreen and x < self.ppt3d.rect_window[0] / 4:
+                self.preview()
+
+        if button == GLUT_RIGHT_BUTTON and mode == GLUT_DOWN:
+            logger.info('按下鼠标右键 (%s, %s)' % (x, y))
+            self.preview()
+
+    def keyboard(self, key, x, y):
+        # Special Key 处理
+        if key in [GLUT_KEY_UP, GLUT_KEY_DOWN, GLUT_KEY_LEFT, GLUT_KEY_RIGHT]:
+            if key in [GLUT_KEY_DOWN, GLUT_KEY_RIGHT]:
+                self.click()
+            elif key in [GLUT_KEY_UP, GLUT_KEY_LEFT]:
+                self.preview()
+            return
+
+        if key == GLUT_KEY_PAGE_UP:
+            self.distance -= 0.2
+            self.set_look_at()
+
+        if key == GLUT_KEY_PAGE_DOWN:
+            self.distance += 0.2
+            self.set_look_at()
+
+        if type(key) is int:
+            return
+
+        # 切换全屏模式
+        if key == b'f':
+            glutFullScreenToggle()
+            if self.ppt3d.fullscreen is True:
+                self.ppt3d.fullscreen = False
+            else:
+                self.ppt3d.fullscreen = True
+            return
+
+        # key = key.decode().lower()
+        if key in [b' ', b'\r']:
+            self.click()
+
+        if key in [b'\x1b', b'q']:
+            sys.exit()
+
+    def timer(self):
+        if self.status == 1:
+            # facing = self.ppt.pages[self.facing].position
+            target = self.ppt.pages[self.target].position
+            self.x += (target.x - self.x) / 10
+            self.y += (target.y - self.y) / 10
+            # self.z += (target.z - self.z) / 10
+
+            if abs(self.x - target.x) <= 0.001:
+                self.facing = self.target
+                self.x, self.y, self.z = self.ppt.pages[self.facing].position.json()
+                self.status = 0
+
+        self.set_look_at()
+
+    def set_look_at(self):
+        gluLookAt(self.x, self.y, self.z + self.distance,
+                  self.x, self.y, self.z + self.distance - 1,
+                  0, 1, 0)
 
 
 logger = getLogger(__name__)

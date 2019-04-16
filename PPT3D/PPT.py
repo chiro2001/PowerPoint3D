@@ -5,6 +5,7 @@ import os
 import json
 import base64
 import io
+import zipfile
 
 
 class Font:
@@ -171,6 +172,9 @@ class Frame:
             res['image'] = base64.b64encode(stream.read()).decode()
         return res
 
+    def __str__(self):
+        return '<Frame %s %s %s>' % (self.fclass, str(list(map(lambda x: float('%.4s' % x), self.rect))), self.text)
+
 
 class Page:
     def __init__(self,
@@ -227,9 +231,9 @@ class PPT:
         # self.pages.append(page)
         for i in range(3):
             page = Page()
-            page.frames.append(Frame(image=Image.open('%s.png' % (i % 2 + 1))))
+            # page.frames.append(Frame(image=Image.open('%s.png' % (i % 2 + 1))))
             # page.frames.append(Frame())
-            # page.frames[0] = Frame(image=Image.open('i.jpg'))
+            page.frames[0] = Frame(image=Image.open('i.jpg'))
             # page.position.load([random.random() * 0.3 for i in range(3)])
             page.position.x += i
             self.pages.append(page)
@@ -247,9 +251,16 @@ class PPT:
     def load_file(self, filename: str):
         if not os.path.exists(filename):
             raise FileNotFoundError
-        with open(filename, 'r') as f:
-            ppt = json.load(f)
-        return ppt
+        if not zipfile.is_zipfile(filename):
+            raise ValueError
+        with zipfile.ZipFile(filename, 'r') as f:
+            try:
+                with f.open('data.json', 'r') as fp:
+                    data = fp.read()
+                    ppt = json.loads(data)
+                    return ppt
+            except FileNotFoundError:
+                raise FileNotFoundError
 
     def save(self, filename: str='save.p3d'):
         pages = []
@@ -258,12 +269,15 @@ class PPT:
         ppt = {
             'pages': pages
         }
-        with open(filename, 'w') as f:
-            f.write(json.dumps(ppt))
+        # with open(filename, 'w') as f:
+        #     f.write(json.dumps(ppt))
+        with zipfile.ZipFile(filename, 'w') as f:
+            with f.open('data.json', 'w') as fp:
+                fp.write(json.dumps(ppt).encode())
 
 
 if __name__ == '__main__':
     _ppt = PPT()
-    _ppt.save()
-    # _ppt.load(filename='save.p3d')
+    # _ppt.save()
+    _ppt.load(filename='save.p3d')
     # print(_ppt.pages[0].frames[0].json())
