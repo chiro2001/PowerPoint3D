@@ -115,7 +115,7 @@ class Frame:
     def __init__(self,
                  fclass: str='Text',
                  rect: Rect=None,
-                 text: str='内容',
+                 text: str='这是一个文本框',
                  image: Image=None,
                  font: Font=None,
                  color_draw: ColorDraw=None,
@@ -139,6 +139,10 @@ class Frame:
             else:
                 self.rect.append(self.image.size[0] / self.image.size[1])
                 self.rect.append(1)
+            self.rect[0] -= 0.5 * (1 - self.rect[0])
+            self.rect[1] -= 0.5 * (1 - self.rect[1])
+            self.rect[2] -= 0.5 * (1 - self.rect[2])
+            self.rect[3] -= 0.5 * (1 - self.rect[3])
 
         if self.font is None:
             self.font = Font()
@@ -223,18 +227,18 @@ class PPT:
         # 储存页面
         self.pages = []
         # 图片，下标就是索引号
-        self.images = []
+        # self.images = []
 
         # 初始化一个页面
         # page = Page()
         # page.position.load([random.random() * 0.5 for i in range(3)])
         # self.pages.append(page)
-        for i in range(3):
+        for i in range(30):
             page = Page()
             # page.frames.append(Frame(image=Image.open('%s.png' % (i % 2 + 1))))
-            # page.frames.append(Frame())
-            page.frames[0] = Frame(image=Image.open('i.jpg'))
-            # page.position.load([random.random() * 0.3 for i in range(3)])
+            page.frames.append(Frame())
+            page.frames[0] = Frame(image=Image.open('%s.png' % (i % 2 + 1)))
+            page.position.load([random.random() * 12.8 for i in range(3)])
             page.position.x += i
             self.pages.append(page)
 

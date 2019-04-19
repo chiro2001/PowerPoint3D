@@ -12,6 +12,9 @@ from PPT3D.templates import Templates
 from PIL import Image
 from base_logger import getLogger
 
+import win32com
+import win32com.client
+
 
 class PPT3D:
 
@@ -70,7 +73,7 @@ class PPT3D:
         # glutSolidTeapot(5)
         # glLoadIdentity()
         # glTranslate(-self.rect_page[0] / 1, -self.rect_page[1] / 1, 0)
-        glTranslate(-0.5, -0.5, 0)
+        glTranslate(-0.5, 0, 0)
 
         index_frame = 0
 
@@ -94,9 +97,6 @@ class PPT3D:
                 # 开始绘制这个Frame，同时设置纹理映射
                 glBindTexture(GL_TEXTURE_2D, index_frame)
                 index_frame += 1
-                # vec_target = [page.position.x + frame.rect[0],
-                #               page.position.y + frame.rect[1],
-                #               page.position.z]
                 vec_target = [frame.rect[0],
                               frame.rect[1],
                               0]
@@ -107,23 +107,14 @@ class PPT3D:
                            vec_target[1],
                            vec_target[2])
                 glTexCoord2f(1.0, 0.0)
-                # glVertex3f(self.size_room[0] * (page.position.x + self.rect_page[0]),
-                #            self.size_room[1] * page.position.y,
-                #            self.size_room[2] * page.position.z)
                 glVertex3f(vec_target[0] + (frame.rect[2] - frame.rect[0]),
                            vec_target[1],
                            vec_target[2])
                 glTexCoord2f(1.0, 1.0)
-                # glVertex3f(self.size_room[0] * (page.position.x + self.rect_page[0]),
-                #            self.size_room[1] * (page.position.y + self.rect_page[1]),
-                #            self.size_room[2] * page.position.z)
                 glVertex3f(vec_target[0] + (frame.rect[2] - frame.rect[0]),
                            vec_target[1] + (frame.rect[3] - frame.rect[1]),
                            vec_target[2])
                 glTexCoord2f(0.0, 1.0)
-                # glVertex3f(self.size_room[0] * page.position.x,
-                #            self.size_room[1] * (page.position.y + self.rect_page[1]),
-                #            self.size_room[2] * page.position.z)
                 glVertex3f(vec_target[0],
                            vec_target[1] + (frame.rect[3] - frame.rect[1]),
                            vec_target[2])
@@ -351,7 +342,7 @@ class Motion:
             target = self.ppt.pages[self.target].position
             self.x += (target.x - self.x) / 10
             self.y += (target.y - self.y) / 10
-            # self.z += (target.z - self.z) / 10
+            self.z += (target.z - self.z) / 10
 
             if abs(self.x - target.x) <= 0.001:
                 self.facing = self.target
@@ -361,8 +352,10 @@ class Motion:
         self.set_look_at()
 
     def set_look_at(self):
+        target = self.ppt.pages[self.target].position
         gluLookAt(self.x, self.y, self.z + self.distance,
-                  self.x, self.y, self.z + self.distance - 1,
+                  # self.x, self.y, self.z + self.distance - 1,
+                  target.x, target.y, target.z,
                   0, 1, 0)
 
 
