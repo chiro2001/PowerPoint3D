@@ -198,7 +198,7 @@ class Page:
             self.size = [1024, 576]
 
         # 添加一个默认文本框
-        self.frames.append(Frame())
+        # self.frames.append(Frame())
         # self.frames.append(Frame(image=Image.open('i.jpg')))
 
     def load(self, page):
@@ -233,14 +233,15 @@ class PPT:
         # page = Page()
         # page.position.load([random.random() * 0.5 for i in range(3)])
         # self.pages.append(page)
-        for i in range(30):
-            page = Page()
-            # page.frames.append(Frame(image=Image.open('%s.png' % (i % 2 + 1))))
-            page.frames.append(Frame())
-            page.frames[0] = Frame(image=Image.open('%s.png' % (i % 2 + 1)))
-            page.position.load([random.random() * 12.8 for i in range(3)])
-            page.position.x += i
-            self.pages.append(page)
+
+        # for i in range(30):
+        #     page = Page()
+        #     # page.frames.append(Frame(image=Image.open('%s.png' % (i % 2 + 1))))
+        #     page.frames.append(Frame())
+        #     page.frames[0] = Frame(image=Image.open('%s.png' % (i % 2 + 1)))
+        #     page.position.load([random.random() * 12.8 for i in range(3)])
+        #     page.position.x += i
+        #     self.pages.append(page)
 
     def load(self, ppt: dict=None, filename: str=None):
         if filename is not None:

@@ -11,9 +11,36 @@ from PPT3D.PPT import *
 from PPT3D.templates import Templates
 from PIL import Image
 from base_logger import getLogger
+import time
 
 import win32com
 import win32com.client
+
+TEMP_PATH = "ppt3d_temp/imgs/"
+
+
+def ppt2img(filepath: str):
+    if os.path.exists(TEMP_PATH) is False:
+        os.makedirs(TEMP_PATH)
+    if os.path.exists(filepath) is False or os.path.isdir(filepath) is True:
+        raise FileNotFoundError
+    name = filepath.split('/')[-1]
+    li = os.listdir(TEMP_PATH)
+    if len(li) > 0:
+        for i in li:
+            os.remove("%s%s" % (TEMP_PATH, i))
+
+    powerpoint = win32com.client.Dispatch('PowerPoint.Application')
+    time.sleep(2)
+    powerpoint.Visible = True
+    ppt = powerpoint.Presentations.Open(filepath)
+    #保存为图片
+    print(os.path.abspath("%s%s.jpg" % (TEMP_PATH, name)))
+    ppt.SaveAs("%s%s.jpg" % (TEMP_PATH, name), 17)
+    # 关闭打开的ppt文件
+    ppt.Close()
+    # 关闭powerpoint软件
+    powerpoint.Quit()
 
 
 class PPT3D:
