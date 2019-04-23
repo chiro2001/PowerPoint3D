@@ -4,21 +4,23 @@ from PIL import Image
 
 # ppt = PPT().load(filename='save.p3d')
 filename = 'test.pptx'
-filename = os.path.abspath(filename)
 print(filename)
 ppt = PPT()
 
 ppt2img(filename)
 
 
-li = os.listdir(TEMP_PATH)
+# li = os.listdir(TEMP_PATH)
+li = os.listdir('E:\\Lance\\PowerPoint3D\\test')
 li.sort()
 for i in li:
     if not i.lower().endswith('.jpg'):
         continue
-    im = Image.open(TEMP_PATH + i)
+    # im = Image.open(TEMP_PATH + i)
+    im = Image.open('E:\\Lance\\PowerPoint3D\\test\\' + i)
     page = Page()
     page.frames.append(Frame(image=im))
+    page.position.load([random.random() * 6.8 for i in range(3)])
     ppt.pages.append(page)
 
 

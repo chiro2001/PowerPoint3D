@@ -19,12 +19,15 @@ import win32com.client
 TEMP_PATH = "ppt3d_temp/imgs/"
 
 
+# 请传入相对位置
 def ppt2img(filepath: str):
     if os.path.exists(TEMP_PATH) is False:
         os.makedirs(TEMP_PATH)
     if os.path.exists(filepath) is False or os.path.isdir(filepath) is True:
         raise FileNotFoundError
     name = filepath.split('/')[-1]
+    filepath = os.path.abspath(filepath)
+    print(name, filepath)
     li = os.listdir(TEMP_PATH)
     if len(li) > 0:
         for i in li:
@@ -36,7 +39,9 @@ def ppt2img(filepath: str):
     ppt = powerpoint.Presentations.Open(filepath)
     #保存为图片
     print(os.path.abspath("%s%s.jpg" % (TEMP_PATH, name)))
-    ppt.SaveAs("%s%s.jpg" % (TEMP_PATH, name), 17)
+    # ppt.SaveAs("%s%s.jpg" % (TEMP_PATH, name), 17)
+    # ppt.SaveAs("imgs.jpg", 17)
+    ppt.SaveAs('E:\\Lance\\PowerPoint3D\\test.jpg', 17)
     # 关闭打开的ppt文件
     ppt.Close()
     # 关闭powerpoint软件
@@ -63,6 +68,7 @@ class PPT3D:
         # 取得屏幕大小
         self.zoom_window = 0.5
         self.rect_screen = list(map(int, [GetSystemMetrics(0), GetSystemMetrics(1)]))
+        self.rect_image = list(map(lambda x: x * 2, self.rect_screen))
         self.rect_window = list(map(int, [self.rect_screen[0] * self.zoom_window,
                                           self.rect_screen[1] * self.zoom_window]))
         self.rect_page = list(map(lambda x: x / 3000, self.rect_screen))
@@ -156,7 +162,8 @@ class PPT3D:
 
     # 加载纹理
     def load_texture(self):
-        renderer = Renderer(self.rect_window)
+        # renderer = Renderer(self.rect_window)
+        renderer = Renderer(self.rect_image)
         # for index in range(len(self.ppt.pages)):
         #     # TODO: Frame渲染
         #     page = self.ppt.pages[index]

@@ -18,6 +18,7 @@ def ppt2png(pptFileName):
 
     ppt = powerpoint.Presentations.Open(ppt_path)
     #保存为图片
+    print('save:', jpg_root + pptFileName.rsplit('.')[0] + '.jpg')
     ppt.SaveAs(jpg_root + pptFileName.rsplit('.')[0] + '.jpg', 17)
     #保存为pdf
     # ppt.SaveAs(jpg_root + outputFileName, 32) # formatType = 32 for ppt to pdf
