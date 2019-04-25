@@ -16,7 +16,7 @@ import time
 import win32com
 import win32com.client
 
-TEMP_PATH = "ppt3d_temp/imgs/"
+TEMP_PATH = "imgs/"
 
 
 # 请传入相对位置
@@ -25,23 +25,24 @@ def ppt2img(filepath: str):
         os.makedirs(TEMP_PATH)
     if os.path.exists(filepath) is False or os.path.isdir(filepath) is True:
         raise FileNotFoundError
-    name = filepath.split('/')[-1]
+    # name = filepath.split('/')[-1]
     filepath = os.path.abspath(filepath)
-    print(name, filepath)
+    # print(name, filepath)
     li = os.listdir(TEMP_PATH)
     if len(li) > 0:
         for i in li:
             os.remove("%s%s" % (TEMP_PATH, i))
 
     powerpoint = win32com.client.Dispatch('PowerPoint.Application')
-    time.sleep(2)
+    # time.sleep(2)
     powerpoint.Visible = True
     ppt = powerpoint.Presentations.Open(filepath)
     #保存为图片
-    print(os.path.abspath("%s%s.jpg" % (TEMP_PATH, name)))
+    # print(os.path.abspath("%s%s.jpg" % (TEMP_PATH, name)))
     # ppt.SaveAs("%s%s.jpg" % (TEMP_PATH, name), 17)
     # ppt.SaveAs("imgs.jpg", 17)
-    ppt.SaveAs('E:\\Lance\\PowerPoint3D\\test.jpg', 17)
+    abspath = os.path.abspath('imgs.jpg')
+    ppt.SaveAs(abspath, 17)
     # 关闭打开的ppt文件
     ppt.Close()
     # 关闭powerpoint软件
@@ -68,7 +69,7 @@ class PPT3D:
         # 取得屏幕大小
         self.zoom_window = 0.5
         self.rect_screen = list(map(int, [GetSystemMetrics(0), GetSystemMetrics(1)]))
-        self.rect_image = list(map(lambda x: x * 2, self.rect_screen))
+        self.rect_image = list(map(lambda x: x * 1, self.rect_screen))
         self.rect_window = list(map(int, [self.rect_screen[0] * self.zoom_window,
                                           self.rect_screen[1] * self.zoom_window]))
         self.rect_page = list(map(lambda x: x / 3000, self.rect_screen))
@@ -372,13 +373,18 @@ class Motion:
 
     def timer(self):
         if self.status == 1:
-            # facing = self.ppt.pages[self.facing].position
+            facing = self.ppt.pages[self.facing].position
             target = self.ppt.pages[self.target].position
+            # self.x += min((target.x - self.x) / 10, -(target.x - facing.x) / 10)
+            # self.y += min((target.y - self.y) / 10, -(target.y - facing.y) / 10)
+            # self.z += min((target.z - self.z) / 10, -(target.z - facing.z) / 10)
             self.x += (target.x - self.x) / 10
             self.y += (target.y - self.y) / 10
             self.z += (target.z - self.z) / 10
 
-            if abs(self.x - target.x) <= 0.001:
+            if abs(self.x - target.x) <= 0.001 \
+                    and abs(self.y - target.y) <= 0.001 \
+                    and abs(self.z - target.z) <= 0.001:
                 self.facing = self.target
                 self.x, self.y, self.z = self.ppt.pages[self.facing].position.json()
                 self.status = 0
