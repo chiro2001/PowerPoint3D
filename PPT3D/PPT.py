@@ -132,6 +132,7 @@ class Frame:
             self.rect.append(self.rect[1] + 0.15)
         if self.image is not None:
             self.fclass = 'Image'
+            self.text = '图像'
             self.rect = [0, 0]
             if self.image.size[0] > self.image.size[1]:
                 self.rect.append(1)
@@ -139,10 +140,15 @@ class Frame:
             else:
                 self.rect.append(self.image.size[0] / self.image.size[1])
                 self.rect.append(1)
-            self.rect[0] -= 0.5 * (1 - self.rect[0])
-            self.rect[1] -= 0.5 * (1 - self.rect[1])
-            self.rect[2] -= 0.5 * (1 - self.rect[2])
-            self.rect[3] -= 0.5 * (1 - self.rect[3])
+            # self.rect[0] -= 0.5 * (1 - self.rect[0])
+            # self.rect[1] -= 0.5 * (1 - self.rect[1])
+            # self.rect[2] -= 0.5 * (1 - self.rect[2])
+            # self.rect[3] -= 0.5 * (1 - self.rect[3])
+
+            # self.rect = [0, -0.5, 1, 0.5]
+
+            # self.rect[1] = 0
+            # self.rect[3] = 1
 
         if self.font is None:
             self.font = Font()

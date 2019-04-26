@@ -92,11 +92,16 @@ class PPT3D:
 
         self.glut_init(self.rect_window[0], self.rect_window[1])
 
+        self.t = 0
+
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
 
         self.motion.timer()
+
+        glRotatef(self.t, 0, 1, 0)
+        self.t += 0.5
 
         # 第一组eyex, eyey,eyez 相机在世界坐标的位置
         # 第二组centerx,centery,centerz 相机镜头对准的物体在世界坐标的位置
@@ -124,7 +129,7 @@ class PPT3D:
                         page.position.z)
             # print(page.json())
 
-            # glutWireCube(1)
+            glutWireCube(0.3)
 
             for i in range(len(page.frames)):
                 frame = page.frames[i]
@@ -259,8 +264,8 @@ class PPT3D:
         glDepthFunc(GL_LESS)
         glShadeModel(GL_SMOOTH)
         # 背面剔除，消隐
-        glEnable(GL_CULL_FACE)
-        glCullFace(GL_BACK)
+        # glEnable(GL_CULL_FACE)
+        # glCullFace(GL_BACK)
         glEnable(GL_POINT_SMOOTH)
         glEnable(GL_LINE_SMOOTH)
         glEnable(GL_POLYGON_SMOOTH)
