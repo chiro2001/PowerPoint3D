@@ -12,6 +12,7 @@ from PPT3D.templates import Templates
 from PIL import Image
 from base_logger import getLogger
 import time
+import copy
 
 import win32com
 import win32com.client
@@ -92,7 +93,7 @@ class PPT3D:
 
         self.glut_init(self.rect_window[0], self.rect_window[1])
 
-        self.t = 0
+        # self.t = 0
 
     def draw(self):
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -100,8 +101,8 @@ class PPT3D:
 
         self.motion.timer()
 
-        glRotatef(self.t, 0, 1, 0)
-        self.t += 0.5
+        # glRotatef(self.t, 0, 1, 0)
+        # self.t += 0.5
 
         # 第一组eyex, eyey,eyez 相机在世界坐标的位置
         # 第二组centerx,centery,centerz 相机镜头对准的物体在世界坐标的位置
@@ -112,7 +113,7 @@ class PPT3D:
         # glutSolidTeapot(5)
         # glLoadIdentity()
         # glTranslate(-self.rect_page[0] / 1, -self.rect_page[1] / 1, 0)
-        glTranslate(-0.5, 0, 0)
+        # glTranslate(-(1 / 2), -(0.75 / 2), 0)
 
         index_frame = 0
 
@@ -127,12 +128,19 @@ class PPT3D:
             glTranslate(page.position.x,
                         page.position.y,
                         page.position.z)
+
             # print(page.json())
 
-            glutWireCube(0.3)
+            # glutWireCube(0.3)
 
             for i in range(len(page.frames)):
                 frame = page.frames[i]
+                rect = frame.rect
+                size = [abs(rect[0] - rect[2]), abs(rect[1] - rect[3])]
+                # print(size)
+
+                glTranslate(-size[0] / 2, -size[1] / 2, 0)
+
                 # 开始绘制这个Frame，同时设置纹理映射
                 glBindTexture(GL_TEXTURE_2D, index_frame)
                 index_frame += 1
@@ -158,6 +166,8 @@ class PPT3D:
                            vec_target[1] + (frame.rect[3] - frame.rect[1]),
                            vec_target[2])
                 glEnd()
+
+                glTranslate(size[0] / 2, size[1] / 2, 0)
 
             glTranslate(-page.position.x,
                         -page.position.y,
@@ -295,6 +305,12 @@ class Motion:
         self.ppt = ppt3d.ppt
         self.ppt3d = ppt3d
 
+        self.angel_target = [0.0, 0.0]
+        self.angel_source = [0.0, 0.0]
+        self.angel = [0.0, 0.0]
+
+        self.new_angel()
+
     def click(self):
         if self.status == 1:
             if self.target == len(self.ppt.pages) - 1:
@@ -394,7 +410,34 @@ class Motion:
                 self.x, self.y, self.z = self.ppt.pages[self.facing].position.json()
                 self.status = 0
 
+        if (self.angel[0] - self.angel_target[0])**2 + (self.angel[1] - self.angel_target[1])**2 \
+                <= (self.angel_source[0] - self.angel_target[0])**2 + (self.angel_source[1] - self.angel_target[1])**2 / 2:
+            self.angel[0] += (self.angel_target[0] - self.angel[0]) / 30
+            self.angel[1] += (self.angel_target[1] - self.angel[1]) / 30
+        else:
+            self.angel[0] -= (self.angel_source[0] - self.angel[0]) / 30
+            self.angel[1] -= (self.angel_source[1] - self.angel[1]) / 30
+        if self.angel_source[0] == self.angel[0]:
+            self.angel[0] -= (self.angel_source[0] - self.angel_target[0]) / 1000
+        if self.angel_source[1] == self.angel[1]:
+            self.angel[1] -= (self.angel_source[1] - self.angel_target[1]) / 1000
+
+        if abs(self.angel[0] - self.angel_target[0]) <= 0.01 \
+                and abs(self.angel[1] - self.angel_target[1]) <= 0.01:
+            self.new_angel()
+
+        if abs(self.angel[0]) > 4 or abs(self.angel[1]) > 4:
+            self.angel = copy.deepcopy(self.angel_source)
+            self.new_angel()
+
+        # print(self.angel, self.angel_target, self.angel_source)
+
         self.set_look_at()
+
+    def new_angel(self):
+        self.angel_source = copy.deepcopy(self.angel_target)
+        self.angel_target = [float(random.uniform(-3, 3)) for i in range(2)]
+        # print(self.angel_target, self.angel_source)
 
     def set_look_at(self):
         target = self.ppt.pages[self.target].position
@@ -402,6 +445,11 @@ class Motion:
                   # self.x, self.y, self.z + self.distance - 1,
                   target.x, target.y, target.z,
                   0, 1, 0)
+
+        glTranslate(self.x, self.y, self.z + self.distance)
+        glRotatef(self.angel[0], 1, 0, 0)
+        glRotatef(self.angel[1], 0, 1, 0)
+        glTranslate(-self.x, -self.y, -self.z - self.distance)
 
 
 logger = getLogger(__name__)

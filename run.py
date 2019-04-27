@@ -67,4 +67,7 @@ if __name__ == '__main__':
 
     logger.warning(_filename)
 
+    with open('error.txt', 'w') as f:
+        f.write(_filename)
+
     main(_filename)
