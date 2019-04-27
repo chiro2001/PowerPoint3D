@@ -31,3 +31,7 @@ ppt3d [-h] [filename]
  - 鼠标右键点击：上一张幻灯片。
  - F键：全屏。
  - Q键/Esc键：退出。
+
+### 效果
+
+![show](https://github.com/LanceLiang2018/PowerPoint3D/raw/master/display/pic1.jpg)
